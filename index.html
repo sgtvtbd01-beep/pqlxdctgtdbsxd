@@ -284,7 +284,7 @@
        CẤU HÌNH ĐƯỜNG DẪN WEB APP APPS SCRIPT MẶC ĐỊNH
        (Bạn có thể dán trực tiếp link exec của bạn vào biến dưới đây)
        ══════════════════════════════════════════════════════════ */
-    const DEFAULT_WEBAPP_URL = ""; 
+    const DEFAULT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwoEGKJLwLRG_qYXJLUuIOsKE3DoPi37Pvt5GANJTf-m0ryVbqNcaWxbfX-3-prPlw-/exec"; 
 
     const STORAGE_KEY = "QLXD_SXD_WEBAPP_URL";
     const iframe = document.getElementById("app-frame");
@@ -300,8 +300,11 @@
         return;
       }
 
-      // 2. Lấy link đã lưu trong localStorage hoặc link mặc định
-      let webAppUrl = localStorage.getItem(STORAGE_KEY) || DEFAULT_WEBAPP_URL;
+      // 2. Lấy link cố định hoặc link đã lưu
+      let webAppUrl = DEFAULT_WEBAPP_URL || localStorage.getItem(STORAGE_KEY);
+      if (DEFAULT_WEBAPP_URL) {
+        try { localStorage.setItem(STORAGE_KEY, DEFAULT_WEBAPP_URL); } catch(_) {}
+      }
 
       if (!webAppUrl || webAppUrl.trim() === "") {
         // Chưa có link -> Hiện màn hình nhập link
