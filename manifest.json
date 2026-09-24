@@ -1,11 +1,11 @@
 {
-  "name": "Phòng Quản lý Xây dựng - Sở Xây dựng TP.HCM",
-  "short_name": "QLXD CTGTĐB",
+  "name": "Phòng Xây dựng Đường bộ - Sở Xây dựng TP.HCM",
+  "short_name": "Xây dựng Đường bộ",
   "description": "Hệ thống Quản lý Dự án & Báo cáo Tiến độ - Sở Xây dựng TP.HCM",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0b1a30",
-  "theme_color": "#0f2b5b",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "orientation": "any",
   "icons": [
     {

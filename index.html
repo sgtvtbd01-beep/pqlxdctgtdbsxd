@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Phòng Quản lý Xây dựng - Sở Xây dựng TP.HCM</title>
+  <title>Phòng Xây dựng Đường bộ - Sở Xây dựng TP.HCM</title>
 
   <!-- PWA & Apple iOS Standalone Support -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="QLXD CTGTĐB" />
-  <meta name="theme-color" content="#0f2b5b" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Xây dựng Đường bộ" />
+  <meta name="theme-color" content="#ffffff" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="format-detection" content="telephone=no" />
 
@@ -28,7 +28,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #0b1a30;
+      background-color: #f8fafc;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       touch-action: pan-x pan-y;
     }
@@ -54,22 +54,22 @@
       background-color: #f8fafc;
     }
 
-    /* Màn hình Splash / Chờ tải ban đầu */
+    /* Màn hình Splash / Chờ tải ban đầu (Tươi sáng, Hiện đại) */
     #splash-screen {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(145deg, #0b1c38 0%, #0f2b5b 100%);
+      background: radial-gradient(circle at 50% 30%, #ffffff 0%, #f0f6ff 65%, #e2ecf9 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      color: #ffffff;
+      color: #0f2b5b;
       padding: 24px;
-      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
     }
     #splash-screen.hidden {
       opacity: 0;
@@ -77,15 +77,18 @@
       pointer-events: none;
     }
 
+    /* Logo tròn nguyên bản, bỏ hoàn toàn khung viền hình vuông bo góc */
     .splash-logo {
-      width: 96px;
-      height: 96px;
-      border-radius: 20px;
-      object-fit: cover;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-      margin-bottom: 20px;
-      border: 2px solid rgba(255,255,255,0.15);
-      animation: pulseLogo 2s infinite ease-in-out;
+      width: 105px;
+      height: 105px;
+      border-radius: 50%;
+      object-fit: contain;
+      margin-bottom: 22px;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+      filter: drop-shadow(0 6px 16px rgba(15, 43, 91, 0.15));
+      animation: pulseLogo 2.2s infinite ease-in-out;
     }
     @keyframes pulseLogo {
       0%, 100% { transform: scale(1); }
@@ -93,29 +96,29 @@
     }
 
     .splash-title {
-      font-size: 19px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
+      font-size: 20px;
+      font-weight: 750;
+      letter-spacing: 0.4px;
       text-align: center;
-      margin-bottom: 6px;
+      margin-bottom: 7px;
       text-transform: uppercase;
-      color: #f8fafc;
+      color: #0f2b5b;
     }
     .splash-subtitle {
-      font-size: 13px;
-      font-weight: 500;
-      color: #94a3b8;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #2563eb;
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 30px;
     }
 
     .splash-loader {
-      width: 48px;
-      height: 48px;
-      border: 3.5px solid rgba(255,255,255,0.15);
+      width: 44px;
+      height: 44px;
+      border: 3.5px solid #dbeafe;
       border-radius: 50%;
-      border-top-color: #38bdf8;
-      animation: spin 0.9s linear infinite;
+      border-top-color: #1d4ed8;
+      animation: spin 0.85s linear infinite;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
@@ -124,8 +127,9 @@
 
     .splash-tip {
       position: absolute;
-      bottom: 24px;
-      font-size: 11.5px;
+      bottom: 28px;
+      font-size: 12px;
+      font-weight: 500;
       color: #64748b;
       text-align: center;
       max-width: 90%;
@@ -216,7 +220,7 @@
   <!-- MÀN HÌNH CHỜ (SPLASH LOADING) -->
   <div id="splash-screen">
     <img src="logo_sxd_official.png" alt="Sở Xây dựng" class="splash-logo" onerror="this.style.display='none'" />
-    <div class="splash-title">Phòng QLXD CTGTĐB</div>
+    <div class="splash-title">PHÒNG XÂY DỰNG ĐƯỜNG BỘ</div>
     <div class="splash-subtitle">Sở Xây dựng Thành phố Hồ Chí Minh</div>
     <div class="splash-loader"></div>
     <div class="splash-tip">Hệ thống Điều hành & Quản lý Dự án Giao thông Trọng điểm</div>
