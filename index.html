@@ -312,6 +312,7 @@
       if (curSearch && !curSearch.includes("caidat") && !curSearch.includes("setup")) {
         finalUrl += (url.includes("?") ? "&" : "?") + curSearch.substring(1);
       }
+      finalUrl += (finalUrl.includes("?") ? "&" : "?") + "_cb=" + Date.now();
 
       iframe.src = finalUrl;
 
