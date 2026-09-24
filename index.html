@@ -209,40 +209,6 @@
     .btn-save:hover {
       background: #1b4b9a;
     }
-
-    /* Mẹo Thêm vào màn hình chính (Smart Tooltip) */
-    #pwa-prompt {
-      position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.94);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #ffffff;
-      padding: 10px 16px;
-      border-radius: 30px;
-      font-size: 12px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      z-index: 999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s, transform 0.4s;
-    }
-    #pwa-prompt.show {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateX(-50%) translateY(0);
-    }
-    #pwa-prompt .close-btn {
-      cursor: pointer;
-      font-size: 14px;
-      opacity: 0.7;
-    }
   </style>
 </head>
 <body>
@@ -271,12 +237,6 @@
         <button type="button" class="btn-save" onclick="luuDuongDan()">Lưu & Truy cập</button>
       </div>
     </div>
-  </div>
-
-  <!-- HƯỚNG DẪN THÊM VÀO MÀN HÌNH CHÍNH (PWA BANNER) -->
-  <div id="pwa-prompt">
-    <span>📲 <strong>Mẹo iOS:</strong> Bấm nút <strong>Chia sẻ (Share) ➔ Thêm vào MH chính</strong> để dùng mượt mà như App!</span>
-    <span class="close-btn" onclick="dongPwaPrompt()">✕</span>
   </div>
 
   <script>
@@ -313,9 +273,6 @@
         // Có link -> Gán vào iframe và chạy ngay
         taiPhanMem(webAppUrl.trim());
       }
-
-      // 3. Hiển thị mẹo Add to Home Screen trên điện thoại (sau 3 giây)
-      kiemTraVaHienPwaPrompt();
     }
 
     function moCaiDat() {
@@ -358,28 +315,6 @@
       setTimeout(function() {
         splash.classList.add("hidden");
       }, 6000);
-    }
-
-    function kiemTraVaHienPwaPrompt() {
-      // Chỉ hiện trên thiết bị di động và khi chưa thêm vào MH chính
-      const isStandalone = window.navigator.standalone || window.matchMedia("(display-mode: standalone)").matches;
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const daXemPrompt = sessionStorage.getItem("QLXD_DA_XEM_PROMPT");
-
-      if (isMobile && !isStandalone && !daXemPrompt) {
-        setTimeout(function() {
-          const prompt = document.getElementById("pwa-prompt");
-          if (prompt) prompt.classList.add("show");
-          sessionStorage.setItem("QLXD_DA_XEM_PROMPT", "1");
-          // Tự tắt sau 9 giây
-          setTimeout(dongPwaPrompt, 9000);
-        }, 3000);
-      }
-    }
-
-    function dongPwaPrompt() {
-      const prompt = document.getElementById("pwa-prompt");
-      if (prompt) prompt.classList.remove("show");
     }
 
     // Lắng nghe phím tắt / sự kiện khẩn cấp để mở lại trang cấu hình URL:
