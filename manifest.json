@@ -1,0 +1,18 @@
+{
+  "name": "Phòng Quản lý Xây dựng - Sở Xây dựng TP.HCM",
+  "short_name": "QLXD CTGTĐB",
+  "description": "Hệ thống Quản lý Dự án & Báo cáo Tiến độ - Sở Xây dựng TP.HCM",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1a30",
+  "theme_color": "#0f2b5b",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "logo_sxd_official.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
