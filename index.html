@@ -345,6 +345,51 @@
       }
     });
 
+    /* ══ [26/09] CHỐNG THOÁT KHI VUỐT NGANG (CHỈ ĐIỆN THOẠI) ══
+       Vuốt từ mép trái là cử chỉ "Quay lại" của iPhone / Zalo / Android — trang
+       web không tắt được. Trang này đặt sẵn một "bước lùi giữ chỗ": vuốt nhầm chỉ
+       lùi về bước đó (vẫn ở trong phần mềm) và hiện lời nhắc; vuốt thêm 1 lần nữa
+       trong 2,5 giây mới thoát thật. Máy tính không chạy đoạn này. */
+    (function chongVuotThoat(){
+      var ua = navigator.userAgent || "";
+      var ngan = Math.min(screen.width || 9999, screen.height || 9999);
+      var laDT = /Android|iPhone|iPod|IEMobile|Windows Phone|Opera Mini|Zalo/i.test(ua) && ngan < 900;
+      if (!laDT) return;
+      var dangGiu = false, lanVuot = 0, henGiu = 0, choThoat = false;
+      function datGiu(){
+        if (dangGiu || choThoat) return;
+        try { history.pushState({ qlxdGiu: Date.now() }, "", location.href); dangGiu = true; } catch(_) {}
+      }
+      function nhac(chu){
+        var o = document.getElementById("vuot-nhac");
+        if (!o) {
+          o = document.createElement("div"); o.id = "vuot-nhac";
+          o.style.cssText = "position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);"
+            + "z-index:10001;background:rgba(15,43,91,.94);color:#fff;font:600 13.5px/1.35 -apple-system,Segoe UI,Roboto,Arial,sans-serif;"
+            + "padding:10px 16px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:86vw;text-align:center;"
+            + "pointer-events:none;transition:opacity .2s;opacity:0";
+          document.body.appendChild(o);
+        }
+        o.textContent = chu; o.style.opacity = "1";
+        clearTimeout(o._hen); o._hen = setTimeout(function(){ o.style.opacity = "0"; }, 2400);
+      }
+      window.addEventListener("popstate", function(){
+        dangGiu = false;
+        var bay = Date.now();
+        if (bay - lanVuot < 2500) { choThoat = true; return; }   /* vuốt lần 2 liền tay: cho thoát */
+        lanVuot = bay;
+        nhac("Vuốt thêm 1 lần nữa để thoát phần mềm");
+        clearTimeout(henGiu);
+        henGiu = setTimeout(function(){ choThoat = false; datGiu(); }, 2600);
+      });
+      /* Dựng bước giữ chỗ ngay khi mở, và dựng lại khi người dùng chạm vào phần
+         mềm (Android chỉ tôn trọng bước lùi tạo ra sau một lần chạm; chạm vào
+         khung phần mềm làm trang này mất tiêu điểm → sự kiện blur). */
+      datGiu();
+      document.addEventListener("touchstart", function(){ if (!dangGiu && !choThoat) datGiu(); }, { capture: true, passive: true });
+      window.addEventListener("blur", function(){ if (!dangGiu && !choThoat) setTimeout(datGiu, 0); });
+    })();
+
     // Bắt đầu chạy
     window.addEventListener("DOMContentLoaded", khoiDong);
   </script>
