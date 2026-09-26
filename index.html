@@ -229,7 +229,17 @@
     <img src="logo_sxd_official.png" alt="Sở Xây dựng" class="splash-logo" onerror="this.style.display='none'" />
     <div class="splash-title">PHÒNG XÂY DỰNG ĐƯỜNG BỘ</div>
     <div class="splash-subtitle">Sở Xây dựng Thành phố Hồ Chí Minh</div>
-    <div class="splash-loader"></div>
+    <div class="splash-loader" id="splash-loader"></div>
+    <div id="splash-trangthai" style="margin-top:14px;font-size:13px;color:#475569;text-align:center;min-height:18px;max-width:320px;line-height:1.45"></div>
+    <div id="splash-loi" style="display:none;margin-top:16px;text-align:center;max-width:340px">
+      <div style="font-size:15px;font-weight:700;color:#0f2b5b;margin-bottom:6px">Phần mềm chưa mở được</div>
+      <div style="font-size:12.5px;color:#64748b;line-height:1.5;margin-bottom:12px">Mạng chậm hoặc máy chủ Google đang bận. Bấm "Tải lại" để thử lại.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+        <button type="button" onclick="location.reload()" style="padding:10px 16px;border:0;border-radius:9px;background:#1d4ed8;color:#fff;font-weight:700;font-size:13.5px">🔄 Tải lại</button>
+        <button type="button" onclick="moTrucTiep()" style="padding:10px 16px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#0f2b5b;font-weight:700;font-size:13.5px">↗ Mở trực tiếp</button>
+        <button type="button" onclick="anSplash()" style="padding:10px 16px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#475569;font-weight:600;font-size:13.5px">Vẫn vào</button>
+      </div>
+    </div>
     <div class="splash-tip">Hệ thống Điều hành & Quản lý Dự án Giao thông Trọng điểm</div>
   </div>
 
@@ -314,20 +324,77 @@
       }
       finalUrl += (finalUrl.includes("?") ? "&" : "?") + "_cb=" + Date.now();
 
+      duongDanGoc = url;
       iframe.src = finalUrl;
-
-      // Khi iframe tải xong thì ẩn màn hình Splash
-      iframe.onload = function() {
-        setTimeout(function() {
-          splash.classList.add("hidden");
-        }, 350);
-      };
-
-      // Dự phòng: Sau 6s tự động ẩn Splash nếu mạng chập chờn
-      setTimeout(function() {
-        splash.classList.add("hidden");
-      }, 6000);
+      canhGacKhoiDong(finalUrl);
     }
+
+    /* ══ [26/09] CHỐNG TRẮNG MÀN HÌNH LÚC MỞ PHẦN MỀM ══
+       LỖI CŨ: màn hình chờ (logo) bị gỡ ngay khi khung Google Apps Script vừa
+       tải xong phần VỎ (onload), hoặc cứng sau 6 giây. Nhưng lúc ấy phần mềm
+       bên trong (màn hình khởi động có tỷ lệ %) thường CHƯA hiện — máy chủ Google
+       "thức dậy" mất 3–20 giây, mạng 4G còn lâu hơn. Gỡ màn hình chờ lúc ấy là để
+       lộ ra trang TRẮNG. Nếu máy chủ trục trặc thì trắng luôn, không nút nào bấm.
+       NAY:
+         · Màn hình chờ CHỈ gỡ khi phần mềm bên trong báo "đã hiện" (tin
+           qlxd:daHien do màn hình khởi động / Portal gửi ra).
+         · 8 giây chưa hiện → báo "mạng chậm, vẫn đang tải".
+         · 25 giây chưa hiện → TỰ tải lại khung phần mềm 1 lần (không tạo thêm
+           bước "quay lại").
+         · 50 giây vẫn chưa hiện → hiện nút Tải lại / Mở trực tiếp / Vẫn vào —
+           người dùng không bao giờ bị kẹt ở trang trắng không có lối ra. */
+    var duongDanGoc = "", daHienPhanMem = false, henGac = [];
+    function datTrangThai(chu){ var o = document.getElementById("splash-trangthai"); if (o) o.textContent = chu || ""; }
+    function anSplash(){
+      splash.classList.add("hidden");
+      henGac.forEach(clearTimeout); henGac = [];
+    }
+    function moTrucTiep(){ if (duongDanGoc) location.href = duongDanGoc; }
+    window.anSplash = anSplash; window.moTrucTiep = moTrucTiep;
+    function canhGacKhoiDong(finalUrl){
+      henGac.forEach(clearTimeout); henGac = [];
+      daHienPhanMem = false;
+      document.getElementById("splash-loi").style.display = "none";
+      document.getElementById("splash-loader").style.display = "";
+      datTrangThai("");
+      henGac.push(setTimeout(function(){
+        if (!daHienPhanMem) datTrangThai("Mạng đang chậm, phần mềm vẫn đang tải…");
+      }, 8000));
+      henGac.push(setTimeout(function(){
+        if (daHienPhanMem) return;
+        datTrangThai("Máy chủ phản hồi chậm — đang tự kết nối lại…");
+        var moi = finalUrl.replace(/([?&]_cb=)\d+/, "$1" + Date.now());
+        try { iframe.contentWindow.location.replace(moi); } catch(_) { iframe.src = moi; }
+      }, 25000));
+      henGac.push(setTimeout(function(){
+        if (daHienPhanMem) return;
+        datTrangThai("");
+        document.getElementById("splash-loader").style.display = "none";
+        document.getElementById("splash-loi").style.display = "block";
+      }, 50000));
+    }
+    window.addEventListener("message", function(ev){
+      var d = ev && ev.data;
+      if (!d || !d.action) return;
+      if (d.action === "qlxd:daHien" || d.action === "qlxd:sanSang") {
+        daHienPhanMem = true;
+        setTimeout(anSplash, 150);
+      } else if (d.action === "qlxd:taiLai") {
+        /* Nút "Tải lại" bên trong phần mềm: tải lại cả trang này (sạch sẽ nhất) */
+        location.reload();
+      }
+    });
+
+    /* [26/09] Mở lại sau thời gian dài (Zalo chạy nền nhiều giờ): phiên làm việc
+       với máy chủ Google đã hết hạn — nút bấm quay mãi, dữ liệu không về, có khi
+       trắng trang. Rời đi quá 3 giờ thì tự tải lại khi quay lại. */
+    (function taiLaiKhiQuayLaiSauLau(){
+      var anLuc = 0;
+      document.addEventListener("visibilitychange", function(){
+        if (document.hidden) { anLuc = Date.now(); return; }
+        if (anLuc && Date.now() - anLuc > 3 * 3600 * 1000) location.reload();
+      });
+    })();
 
     // Lắng nghe phím tắt / sự kiện khẩn cấp để mở lại trang cấu hình URL:
     // Nhấp 4 lần liên tiếp vào logo splash hoặc mép trên cùng của màn hình
@@ -400,7 +467,7 @@
         function ket(kq){ if (da) return; da = true; xong(kq); }
         choTraLoi = { id: id, xong: ket };
         guiXuong(window, { action: "qlxd:quayLai", id: id }, 0);
-        setTimeout(function(){ if (choTraLoi && choTraLoi.id === id) choTraLoi = null; ket(false); }, 450);
+        setTimeout(function(){ if (choTraLoi && choTraLoi.id === id) choTraLoi = null; ket(false); }, 900);
       }
       window.addEventListener("popstate", function(){
         dangGiu = false;
