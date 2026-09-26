@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Phòng Xây dựng Đường bộ - Sở Xây dựng TP.HCM</title>
+  <title>Sở Xây dựng</title>
 
   <!-- Chống lưu bộ nhớ đệm cũ trên điện thoại (Bắt buộc cập nhật mới) -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -373,14 +373,50 @@
         o.textContent = chu; o.style.opacity = "1";
         clearTimeout(o._hen); o._hen = setTimeout(function(){ o.style.opacity = "0"; }, 2400);
       }
+      /* [26/09] NÚT QUAY LẠI (mũi tên góc trên trái / vuốt mép trái) = "LÙI 1 BƯỚC".
+         Trước hết hỏi phần mềm bên trong: đang mở nội dung nào (thẻ Pháp lý, Bản
+         đồ, khung xem PDF, màn cài đặt…) thì phần mềm tự lùi về bước trước và trả
+         lời "đã lùi" — trang này dựng lại bậc giữ chỗ, KHÔNG thoát. Không phân hệ
+         nào lùi được nữa (đã ở giao diện ngoài cùng) thì mới hỏi thoát: bấm thêm
+         1 lần nữa trong 2,5 giây là thoát. */
+      var choTraLoi = null;
+      window.addEventListener("message", function(ev){
+        var d = ev && ev.data;
+        if (d && d.action === "qlxd:daQuayLai" && choTraLoi && d.id === choTraLoi.id) {
+          var f = choTraLoi.xong; choTraLoi = null; f(true);
+        }
+      });
+      function guiXuong(w, msg, sau){
+        if (sau > 6) return;
+        var n = 0;
+        try { n = w.frames.length; } catch(_) { return; }
+        for (var i = 0; i < n; i++) {
+          try { var c = w.frames[i]; c.postMessage(msg, "*"); guiXuong(c, msg, sau + 1); } catch(_) {}
+        }
+      }
+      function hoiQuayLai(xong){
+        var id = "ql" + Date.now() + Math.random().toString(36).slice(2, 6);
+        var da = false;
+        function ket(kq){ if (da) return; da = true; xong(kq); }
+        choTraLoi = { id: id, xong: ket };
+        guiXuong(window, { action: "qlxd:quayLai", id: id }, 0);
+        setTimeout(function(){ if (choTraLoi && choTraLoi.id === id) choTraLoi = null; ket(false); }, 450);
+      }
       window.addEventListener("popstate", function(){
         dangGiu = false;
         var bay = Date.now();
-        if (bay - lanVuot < 2500) { choThoat = true; return; }   /* vuốt lần 2 liền tay: cho thoát */
-        lanVuot = bay;
-        nhac("Vuốt thêm 1 lần nữa để thoát phần mềm");
-        clearTimeout(henGiu);
-        henGiu = setTimeout(function(){ choThoat = false; datGiu(); }, 2600);
+        if (bay - lanVuot < 2500) { choThoat = true; return; }   /* bấm lần 2 liền tay ở giao diện ngoài cùng: cho thoát */
+        hoiQuayLai(function(daLui){
+          if (daLui) {                     /* phần mềm đã lùi 1 bước: giữ lại, không thoát */
+            lanVuot = 0; choThoat = false; clearTimeout(henGiu);
+            datGiu();
+            return;
+          }
+          lanVuot = Date.now();
+          nhac("Bấm quay lại thêm 1 lần nữa để thoát phần mềm");
+          clearTimeout(henGiu);
+          henGiu = setTimeout(function(){ choThoat = false; datGiu(); }, 2600);
+        });
       });
       /* Dựng bước giữ chỗ ngay khi mở, và dựng lại khi người dùng chạm vào phần
          mềm (Android chỉ tôn trọng bước lùi tạo ra sau một lần chạm; chạm vào
